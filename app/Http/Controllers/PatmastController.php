@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 
 class PatmastController extends Controller
 {
@@ -43,6 +44,8 @@ class PatmastController extends Controller
 
 		}
 
+        $this->mesibo_id($value['Newic']);
+
         unlink(public_path().'/uploadini/'.$getid."_patmast.ini");
 		$patmast = DB::table('hisdb.pat_mast')->where('idno','=',$lastid)->first();
 
@@ -69,6 +72,17 @@ class PatmastController extends Controller
     public static function turn_date($from_date,$from_format='d/m/Y'){
         $carbon = Carbon::createFromFormat($from_format,$from_date);
         return $carbon;
+    }
+
+    public function mesibo_id($username){
+
+        $url = "https://api.mesibo.com/api.php?op=useradd&addr=".$username."&appid=com.".$username."&name=".$username."&active=1&token=yk2mza2txnms9qu31t0jaszpqm03s7ejyd7hk1obnsi78or4j2va6qx6s0qit8ot";
+
+        $client = new Client(['base_uri' => $url]);
+
+        $response = $client->get($url);
+
+        dd($response);
     }
 
 

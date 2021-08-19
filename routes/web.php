@@ -20,3 +20,4 @@ Route::get('/episode', 'EpisodeController@show');
 Route::get('/emergency', 'EpisodeController@emergency');
 
 Route::get('/patmast', 'PatmastController@show');
+
