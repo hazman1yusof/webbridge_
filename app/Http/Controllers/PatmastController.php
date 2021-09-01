@@ -32,6 +32,7 @@ class PatmastController extends Controller
             $users_obj = DB::table('sysdb.users')->where('username','=',$value['Newic']);  
             
             if(!$users_obj->exists()){
+
                 DB::table('sysdb.users')->insert([
                     'compcode' => '9A',
                     'username' => $value['Newic'],
@@ -43,8 +44,6 @@ class PatmastController extends Controller
             }
 
 		}
-
-        $this->mesibo_id($value['Newic']);
 
         unlink(public_path().'/uploadini/'.$getid."_patmast.ini");
 		$patmast = DB::table('hisdb.pat_mast')->where('idno','=',$lastid)->first();
@@ -78,11 +77,25 @@ class PatmastController extends Controller
 
         $url = "https://api.mesibo.com/api.php?op=useradd&addr=".$username."&appid=com.".$username."&name=".$username."&active=1&token=yk2mza2txnms9qu31t0jaszpqm03s7ejyd7hk1obnsi78or4j2va6qx6s0qit8ot";
 
-        $client = new Client(['base_uri' => $url]);
+        $client = new Client(['base_uri' =>  'https://api.mesibo.com/api.php']);
 
-        $response = $client->get($url);
+        $response = $client->request('GET', 'https://api.mesibo.com/api.php', [
+                        'query' => ['op' => 'useradd',
+                                    'addr' => $username,
+                                    'appid' => 'com.'.$username,
+                                    'name' => $username,
+                                    'active' => '1',
+                                    'token' => 'yk2mza2txnms9qu31t0jaszpqm03s7ejyd7hk1obnsi78or4j2va6qx6s0qit8ot'
+                                    ]
+                    ]);
 
-        dd($response);
+        $retresponse = json_decode($response->getBody()->getContents());
+
+        if(!empty($retresponse)){
+            return $retresponse->user->token;
+        }else{
+            return null;
+        }
     }
 
 
