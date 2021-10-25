@@ -21,3 +21,6 @@ Route::get('/emergency', 'EpisodeController@emergency');
 
 Route::get('/patmast', 'PatmastController@show');
 
+Route::get('/diagnose', 'DoctornoteController@show');
+Route::post('/diagnose', 'DoctornoteController@post');
+
