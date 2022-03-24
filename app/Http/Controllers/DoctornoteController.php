@@ -38,12 +38,15 @@ class DoctornoteController extends Controller
     public function post(Request $request)
     {   
 
-        // print_r($request->post());
-
         try {
-
             foreach ($request->post() as $key => $value) {
                 switch ($key) {
+                    case 'episode':
+                        $this->episode($value);
+                        break;
+                    case 'patmast':
+                        $this->pat_mast($value);
+                        break;
                     case 'diagnose':
                         $this->diagnose($value);
                         break;
@@ -72,6 +75,66 @@ class DoctornoteController extends Controller
 
     }
 
+    public function episode($value)
+    { 
+
+        $episode_arr = $value;
+
+        foreach ($episode_arr as $obj) {
+            $array = [];
+
+            foreach ($obj as $data) {
+                $array[$data[0]] = $data[1];
+            }
+
+            $episode_obj = DB::table('hisdb.episode')->where('mrn','=',$array['mrn'])->where('episno','=',$array['episno']);
+
+            if($episode_obj->exists()){
+                $episode_obj->update($array);
+            }else{
+                $episode_obj->insert($array);
+            }
+        }
+
+    }
+
+    public function pat_mast($value)
+    { 
+
+        $pat_mast_arr = $value;
+
+        foreach ($pat_mast_arr as $obj) {
+            $array = [];
+
+            foreach ($obj as $data) {
+                $array[$data[0]] = $data[1];
+            }
+
+            $pat_mast_obj = DB::table('hisdb.pat_mast')->where('mrn','=',$array['mrn']);
+
+            if($pat_mast_obj->exists()){
+                $pat_mast_obj->update($array);
+            }else{
+                $pat_mast_obj->insert($array);
+            }
+
+
+            $users_obj = DB::table('sysdb.users')->where('username','=',$array['newic']);  
+            
+            if(!$users_obj->exists()){
+                DB::table('sysdb.users')->insert([
+                    'compcode' => '9A',
+                    'username' => $array['newic'],
+                    'password' => $array['newic'],
+                    'name' => $array['name'],
+                    'groupid' => 'patient',
+                    'mrn' => $array['mrn'],
+                ]);
+            }
+        }
+
+    }
+
     public function diagnose($value)
     { 
 
@@ -88,6 +151,8 @@ class DoctornoteController extends Controller
 
             if($episode_obj->exists()){
                 $episode_obj->update($array);
+            }else{
+                $episode_obj->insert($array);
             }
         }
 
@@ -104,12 +169,12 @@ class DoctornoteController extends Controller
                 $array[$data[0]] = $data[1];
             }
 
-            $episode_obj = DB::table('hisdb.patexam')->where('mrn','=',$array['mrn'])->where('episno','=',$array['episno']);
+            $patexam_obj = DB::table('hisdb.patexam')->where('mrn','=',$array['mrn'])->where('episno','=',$array['episno']);
 
-            if($episode_obj->exists()){
-                $episode_obj->update($array);
+            if($patexam_obj->exists()){
+                $patexam_obj->update($array);
             }else{
-                $episode_obj->insert($array);
+                $patexam_obj->insert($array);
             }
         }
     }
@@ -126,12 +191,12 @@ class DoctornoteController extends Controller
                 $array[$data[0]] = $data[1];
             }
 
-            $episode_obj = DB::table('hisdb.pathealth')->where('mrn','=',$array['mrn'])->where('episno','=',$array['episno']);
+            $pathealth_obj = DB::table('hisdb.pathealth')->where('mrn','=',$array['mrn'])->where('episno','=',$array['episno']);
 
-            if($episode_obj->exists()){
-                $episode_obj->update($array);
+            if($pathealth_obj->exists()){
+                $pathealth_obj->update($array);
             }else{
-                $episode_obj->insert($array);
+                $pathealth_obj->insert($array);
             }
         }
     }
@@ -148,12 +213,12 @@ class DoctornoteController extends Controller
                 $array[$data[0]] = $data[1];
             }
 
-            $episode_obj = DB::table('hisdb.pathistory')->where('mrn','=',$array['mrn']);
+            $pathistory_obj = DB::table('hisdb.pathistory')->where('mrn','=',$array['mrn']);
 
-            if($episode_obj->exists()){
-                $episode_obj->update($array);
+            if($pathistory_obj->exists()){
+                $pathistory_obj->update($array);
             }else{
-                $episode_obj->insert($array);
+                $pathistory_obj->insert($array);
             }
         }
     }
