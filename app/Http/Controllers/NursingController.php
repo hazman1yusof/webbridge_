@@ -1,0 +1,104 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use DB;
+use Carbon\Carbon;
+
+class NursingController extends Controller
+{
+
+    public function show(Request $request)
+    {   
+    }
+
+    public function post(Request $request)
+    {   
+
+        try {
+            foreach ($request->post() as $key => $value) {
+                switch ($key) {
+                    case 'pathealth':
+                        $this->pathealth($value);
+                        break;
+                }
+            }
+            echo 'success';
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+
+            echo $e->getMessage();
+        }
+
+    }
+
+    public function pathealth($value)
+    { 
+        
+        $pathealth_arr = $value;
+
+        foreach ($pathealth_arr as $obj) {
+            $array = [];
+
+            foreach ($obj as $data) {
+                $array[$data[0]] = $data[1];
+            }
+            
+
+            $pathealth_obj = DB::table('hisdb.pathealth')->where('mrn','=',$array['mrn'])->where('episno','=',$array['episno']);
+
+            
+            if($pathealth_obj->exists()){
+                $edit_array = [];
+
+                if($this->check_fld($pathealth_obj,'height')){
+                    $edit_array = array_merge($edit_array,['height' => $array['height']]);
+                }
+                if($this->check_fld($pathealth_obj,'weight')){
+                    $edit_array = array_merge($edit_array,['weight' => $array['weight']]);
+                }
+                if($this->check_fld($pathealth_obj,'temperature')){
+                    $edit_array = array_merge($edit_array,['temperature' => $array['temperature']]);
+                }
+                if($this->check_fld($pathealth_obj,'pulse')){
+                    $edit_array = array_merge($edit_array,['pulse' => $array['pulse']]);
+                }
+                if($this->check_fld($pathealth_obj,'bp_sys1')){
+                    $edit_array = array_merge($edit_array,['bp_sys1' => $array['bp_sys1']]);
+                }
+                if($this->check_fld($pathealth_obj,'bp_dias2')){
+                    $edit_array = array_merge($edit_array,['bp_dias2' => $array['bp_dias2']]);
+                }
+                if($this->check_fld($pathealth_obj,'respiration')){
+                    $edit_array = array_merge($edit_array,['respiration' => $array['respiration']]);
+                }
+                if($this->check_fld($pathealth_obj,'gxt')){
+                    $edit_array = array_merge($edit_array,['gxt' => $array['gxt']]);
+                }
+                if($this->check_fld($pathealth_obj,'pain_score')){
+                    $edit_array = array_merge($edit_array,['pain_score' => $array['pain_score']]);
+                }
+
+                $pathealth_obj->update($edit_array);
+
+            }else{
+                DB::table('hisdb.pathealth')->insert($array);
+            }
+        }
+    }
+
+    public function check_fld($obj,$fld){
+        $array = (array)$obj->first();
+
+        if(empty($array[$fld]) || $array[$fld] == '0.00'){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+}

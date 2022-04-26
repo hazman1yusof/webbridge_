@@ -23,4 +23,6 @@ Route::get('/patmast', 'PatmastController@show');
 
 Route::get('/diagnose', 'DoctornoteController@show');
 Route::post('/diagnose', 'DoctornoteController@post');
+Route::post('/nursing', 'NursingController@post');
+Route::get('/pathealth2', 'NursingController@pathealth2');
 
