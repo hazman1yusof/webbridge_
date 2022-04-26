@@ -51,6 +51,7 @@ class NursingController extends Controller
             $this->cover_patdietncase($array);
             $this->cover_patdietfup($array);
 
+
         }
     }
 
@@ -89,7 +90,9 @@ class NursingController extends Controller
                 $edit_array = array_merge($edit_array,['pain_score' => $array['pain_score']]);
             }
 
-            $pathealth_obj->update($edit_array);
+            if(!empty($edit_array)){
+                $pathealth_obj->update($edit_array);
+            }
 
         }else{
             DB::table('hisdb.pathealth')->insert($array);
@@ -131,8 +134,9 @@ class NursingController extends Controller
                 $edit_array = array_merge($edit_array,['pain_score' => $array['pain_score']]);
             }
 
-            $patdietfup_obj->update($edit_array);
-
+            if(!empty($edit_array)){
+                $patdietfup_obj->update($edit_array);
+            }
         }else{
             DB::table('hisdb.patdietfup')->insert($array);
         }
@@ -141,7 +145,6 @@ class NursingController extends Controller
 
     public function cover_patdietncase($array){
         $patdietncase_obj = DB::table('hisdb.patdietncase')->where('mrn','=',$array['mrn']);
-
             
         if($patdietncase_obj->exists()){
             $edit_array = [];
@@ -174,10 +177,16 @@ class NursingController extends Controller
                 $edit_array = array_merge($edit_array,['pain_score' => $array['pain_score']]);
             }
 
-            $patdietncase_obj->update($edit_array);
+
+            if(!empty($edit_array)){
+                $patdietncase_obj->update($edit_array);
+            }
 
         }else{
-            DB::table('hisdb.patdietncase')->insert($array);
+
+            $add_array = $this->array_except($array, ['episno']);
+
+            DB::table('hisdb.patdietncase')->insert($add_array);
         }
         
     }
@@ -192,5 +201,8 @@ class NursingController extends Controller
         }
     }
 
+    public function array_except($array, $keys) {
+      return array_diff_key($array, array_flip((array) $keys));   
+    } 
 
 }
