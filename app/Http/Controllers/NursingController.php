@@ -16,6 +16,9 @@ class NursingController extends Controller
     public function post(Request $request)
     {   
 
+
+        DB::beginTransaction();
+
         try {
             foreach ($request->post() as $key => $value) {
                 switch ($key) {
@@ -56,43 +59,15 @@ class NursingController extends Controller
     }
 
     public function cover_pathealth($array){
-        $pathealth_obj = DB::table('hisdb.pathealth')->where('mrn','=',$array['mrn'])->where('episno','=',$array['episno']);
-
+        $pathealth_obj = DB::table('hisdb.pathealth')
+                            ->where('mrn','=',$array['mrn'])
+                            ->where('episno','=',$array['episno']);
             
         if($pathealth_obj->exists()){
-            $edit_array = [];
-
-            if($this->check_fld($pathealth_obj,'height')){
-                $edit_array = array_merge($edit_array,['height' => $array['height']]);
-            }
-            if($this->check_fld($pathealth_obj,'weight')){
-                $edit_array = array_merge($edit_array,['weight' => $array['weight']]);
-            }
-            if($this->check_fld($pathealth_obj,'temperature')){
-                $edit_array = array_merge($edit_array,['temperature' => $array['temperature']]);
-            }
-            if($this->check_fld($pathealth_obj,'pulse')){
-                $edit_array = array_merge($edit_array,['pulse' => $array['pulse']]);
-            }
-            if($this->check_fld($pathealth_obj,'bp_sys1')){
-                $edit_array = array_merge($edit_array,['bp_sys1' => $array['bp_sys1']]);
-            }
-            if($this->check_fld($pathealth_obj,'bp_dias2')){
-                $edit_array = array_merge($edit_array,['bp_dias2' => $array['bp_dias2']]);
-            }
-            if($this->check_fld($pathealth_obj,'respiration')){
-                $edit_array = array_merge($edit_array,['respiration' => $array['respiration']]);
-            }
-            if($this->check_fld($pathealth_obj,'gxt')){
-                $edit_array = array_merge($edit_array,['gxt' => $array['gxt']]);
-            }
-            if($this->check_fld($pathealth_obj,'pain_score')){
-                $edit_array = array_merge($edit_array,['pain_score' => $array['pain_score']]);
-            }
-
-            if(!empty($edit_array)){
-                $pathealth_obj->update($edit_array);
-            }
+            $pathealth_obj = $pathealth_obj
+                            ->where('recordtime','=',null);
+                            
+            $pathealth_obj->update($array);
 
         }else{
             DB::table('hisdb.pathealth')->insert($array);

@@ -38,6 +38,8 @@ class DoctornoteController extends Controller
     public function post(Request $request)
     {   
 
+        DB::beginTransaction();
+        
         try {
             foreach ($request->post() as $key => $value) {
                 switch ($key) {
@@ -169,7 +171,9 @@ class DoctornoteController extends Controller
                 $array[$data[0]] = $data[1];
             }
 
-            $patexam_obj = DB::table('hisdb.patexam')->where('mrn','=',$array['mrn'])->where('episno','=',$array['episno']);
+            $patexam_obj = DB::table('hisdb.patexam')
+                            ->where('mrn','=',$array['mrn'])
+                            ->where('episno','=',$array['episno']);
 
             if($patexam_obj->exists()){
                 $patexam_obj->update($array);
@@ -191,7 +195,10 @@ class DoctornoteController extends Controller
                 $array[$data[0]] = $data[1];
             }
 
-            $pathealth_obj = DB::table('hisdb.pathealth')->where('mrn','=',$array['mrn'])->where('episno','=',$array['episno']);
+            $pathealth_obj = DB::table('hisdb.pathealth')
+                                ->where('mrn','=',$array['mrn'])
+                                ->where('episno','=',$array['episno'])
+                                ->where('recordtime','=',$array['recordtime']);
 
             if($pathealth_obj->exists()){
                 $pathealth_obj->update($array);
